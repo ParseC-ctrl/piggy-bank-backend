@@ -1,0 +1,23 @@
+# 开发环境配置
+app:
+  prefix: '/api'
+  port: 3000
+
+# 数据库配置
+db:
+  mysql:
+    host: 'localhost'
+    username: 'root'
+    password: 'chuan0718'
+    database: 'piggy_bank_prod'
+    port: 3306
+    synchronize: false
+    retryDelay: 1000
+    retryAttempts: 3
+    charset: 'utf8mb4'
+    timezone: '+08:00'
+    logging: true
+
+jwt:
+  secretkey: 'zANDwNQVFzxlfG9myPxVWAkq4iXJEPhI'
+  expiresin: '2h'
