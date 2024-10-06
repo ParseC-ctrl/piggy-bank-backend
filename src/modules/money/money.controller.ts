@@ -12,19 +12,20 @@ import { CreateMoneysDto } from './dto/create-money.dto';
 import { UpdateMoneyDto } from './dto/update-money.dto';
 import { DeleteMoneysDto } from './dto/delete-money.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { UserIdGuard } from '../user/entities/user.guard';
 
 @Controller('money')
 export class MoneyController {
   constructor(private readonly moneyService: MoneyService) {}
 
   @Post('create')
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), UserIdGuard)
   create(@Body() createMoneyDto: CreateMoneysDto) {
     return this.moneyService.createMoneys(createMoneyDto);
   }
 
   @Put('update')
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
   updateMoney(
     @Query('moneyId') moneyId: string,
     @Body() updateMoneyDto: UpdateMoneyDto,
@@ -33,7 +34,7 @@ export class MoneyController {
   }
 
   @Delete('delete')
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), UserIdGuard)
   async deleteMoneys(@Body() deleteMoneysDto: DeleteMoneysDto) {
     return this.moneyService.deleteMoneys(deleteMoneysDto);
   }

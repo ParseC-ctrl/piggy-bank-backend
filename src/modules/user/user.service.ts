@@ -5,28 +5,16 @@ import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
-import * as svgCaptcha from 'svg-captcha';
 import * as md5 from 'md5';
 
 @Injectable()
 export class UserService {
+  private readonly tokenBlacklist = new Set<string>();
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
   ) {}
-
-  // 生成验证码
-  generateCaptcha() {
-    const captcha = svgCaptcha.create();
-    return {
-      info: {
-        data: captcha.data,
-        text: captcha.text,
-      },
-      message: '生成验证码成功',
-    };
-  }
 
   // 用户注册
   async registerUser(createUserDto: CreateUserDto): Promise<string> {
@@ -58,15 +46,17 @@ export class UserService {
   }
 
   // 用户登录
-  async loginUser(
-    loginUserDto: LoginUserDto,
-    captchaText: string,
-  ): Promise<string> {
+  async loginUser(loginUserDto: LoginUserDto, session: any): Promise<string> {
     const { nickname, password, captcha } = loginUserDto;
 
     // 验证验证码
-    if (captcha !== captchaText) {
+    const sessionCaptcha = session.captcha;
+    if (captcha.toLowerCase() !== sessionCaptcha?.text.toLowerCase()) {
       throw new BadRequestException('验证码无效');
+    }
+    const isCaptchaExpired = Date.now() - sessionCaptcha?.createdAt > 60000;
+    if (isCaptchaExpired) {
+      throw new BadRequestException('验证码已过期');
     }
 
     // 检查用户是否存在
@@ -91,5 +81,26 @@ export class UserService {
   // 通过昵称查找用户
   async findOneByNickname(nickname: string): Promise<User | undefined> {
     return this.userRepository.findOneBy({ nickname });
+  }
+
+  async getInfo(userId: string) {
+    const user = await this.userRepository.findOne({
+      where: { userId },
+      select: ['userId', 'gender', 'avatar', 'phone', 'nickname'],
+    });
+    return user;
+  }
+
+  async logout(userId: string, token: string): Promise<void> {
+    // 将令牌添加到黑名单
+    this.tokenBlacklist.add(token);
+    console.log(
+      `User with ID ${userId} has logged out. Token added to blacklist.`,
+    );
+  }
+
+  isTokenBlacklisted(token: string): boolean {
+    console.log(this.tokenBlacklist);
+    return this.tokenBlacklist.has(token);
   }
 }

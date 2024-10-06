@@ -10,8 +10,15 @@ import { Logger } from 'src/utils/log4js';
 
 @Injectable()
 export class TransformInterceptor implements NestInterceptor {
+  private readonly whitelist: string[] = ['/api/user/captcha'];
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const req = context.getArgByIndex(1).req;
+    const url = req.originalUrl;
+
+    // 检查请求的 URL 是否在白名单中
+    if (this.whitelist.includes(url)) {
+      return next.handle();
+    }
     return next.handle().pipe(
       map((data) => {
         const logFormat = `<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
