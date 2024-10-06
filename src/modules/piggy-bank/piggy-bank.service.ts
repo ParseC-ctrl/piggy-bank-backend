@@ -95,10 +95,7 @@ export class PiggyBankService {
       .getMany();
 
     if (piggyBanks.length === 0) {
-      return {
-        code: 404,
-        message: '存钱罐不存在',
-      };
+      return [];
     }
 
     // 假设只返回第一个匹配的 PiggyBank
@@ -117,7 +114,7 @@ export class PiggyBankService {
     // 过滤掉 moneyId 字段
     const filteredMoneyRecords = moneyRecords.map(
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      ({ moneyId, userId, piggyBankId, ...rest }) => rest,
+      ({ userId, piggyBankId, ...rest }) => rest,
     );
 
     // 将 Money 数据添加到 PiggyBank 对象

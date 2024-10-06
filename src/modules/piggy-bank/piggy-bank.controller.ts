@@ -3,7 +3,6 @@ import {
   Post,
   Body,
   Put,
-  Delete,
   UseGuards,
   Get,
   Param,
@@ -38,7 +37,7 @@ export class PiggyBankController {
     return this.piggyBankService.updatePiggyBank(updatePiggyBankInfo);
   }
 
-  @Delete('delete')
+  @Post('delete')
   @UseGuards(AuthGuard('jwt'), UserIdGuard)
   deletePiggyBank(@Body() deletePiggyBankDto: DeletePiggyBankDto) {
     return this.piggyBankService.removePiggyBank(deletePiggyBankDto);

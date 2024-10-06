@@ -1,8 +1,8 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
-  UnauthorizedException,
 } from '@nestjs/common';
 
 @Injectable()
@@ -13,11 +13,10 @@ export class UserIdGuard implements CanActivate {
     const userIdFromBody = request.body.userId;
     const userIdFromQuery = request.query.userId;
     const userIdFromJwt = request.user.userId;
-
     const userId = userIdFromParam || userIdFromBody || userIdFromQuery;
 
     if (userId !== userIdFromJwt) {
-      throw new UnauthorizedException(
+      throw new ForbiddenException(
         "You are not authorized to access this user's piggy bank",
       );
     }

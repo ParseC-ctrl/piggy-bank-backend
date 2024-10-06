@@ -25,7 +25,7 @@ export class MoneyController {
   }
 
   @Put('update')
-  @UseGuards(AuthGuard('jwt'), UserIdGuard)
+  @UseGuards(AuthGuard('jwt'))
   updateMoney(
     @Query('moneyId') moneyId: string,
     @Body() updateMoneyDto: UpdateMoneyDto,
